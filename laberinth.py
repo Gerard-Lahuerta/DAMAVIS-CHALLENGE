@@ -5,12 +5,12 @@ class Cell():
     def __init__(self, type, x, y):
         self.type = type
         self.neighbors = []
-        self.distance = 0
         self.visited = False
         self.n_visited = 0
         self.moves = 0
         self.axis = "X"
         self.position = [x,y]
+        self.estimated_distance = 0
     
     def set_neighbors(self, neighbors_position):
         self.neighbors = neighbors_position
@@ -28,6 +28,9 @@ class Cell():
         neigh = self.neighbors[self.n_visited//2]
         return neigh
     
+    def update_n_visited(self):
+        self.n_visited += 1
+    
     def get_n_visited(self):
         return self.n_visited
     
@@ -36,9 +39,19 @@ class Cell():
             self.axis = "Y"
         else:
             self.axis = "X"
+        self.update_n_visited()
 
     def get_position(self):
         return self.position
+    
+    def get_distance(self):
+        return self.distance
+    
+    def set_visited(self):
+        self.visited = True
+
+    def update_estimated_distance(self, dist):
+        self.estimated_distance = self.moves + dist
 
 ############################################################################################
 
@@ -88,7 +101,7 @@ def create_laberinth_cell(n_last_row, n_last_col):
 
             laberinth[n_row][n_col] = cell
 
-def Possible_rotation_cells(pos, n_last_row, n_last_col):
+def possible_rotation_cells(pos, n_last_row, n_last_col):
     
     neighs = laberinth[i[0]][i[1]].get_neighbors(pos)
     neighs += calc_vertice_neighbors(pos, n_last_row, n_last_col)
@@ -103,6 +116,9 @@ def Possible_rotation_cells(pos, n_last_row, n_last_col):
 ############################################################################################
 
 
+def expand(cell):
+    pass
+
 def A_Star(start, n_last_row, n_last_col): 
     '''
     Runs AStar algorithm to find the shortest path
@@ -112,9 +128,21 @@ def A_Star(start, n_last_row, n_last_col):
     queue = [start]
 
     for cell in queue:
-        poss = cell.get_possition()
-        if calc_Manh_distance(poss, pos_exit) == 1:
+        cell.set_visited()
+
+        pos = cell.get_position()
+        if calc_Manh_distance(pos, pos_exit) == 1:
             return cell.get_moves()
+        
+        queue += expand(cell)
+
+        if possible_rotation_cells(pos, n_last_row, n_last_col):
+            cell.rotate()
+            queue += expand(cell)
+
+        queue.sort(key=lambda c: c.estimated_distance)
+
+        
 
     return None
 
