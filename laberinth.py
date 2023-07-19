@@ -2,16 +2,15 @@ class Cell():
     '''
     Represents de cells of the laberinth
     '''
-    def __init__(self, type):
+    def __init__(self, type, x, y):
         self.type = type
-        self.rotate = True
         self.neighbors = []
         self.distance = 0
         self.visited = False
         self.n_visited = 0
-
-    def set_distance(self, dist):
-        self.distance = dist
+        self.moves = 0
+        self.axis = "X"
+        self.position = [x,y]
     
     def set_neighbors(self, neighbors_position):
         self.neighbors = neighbors_position
@@ -31,30 +30,15 @@ class Cell():
     
     def get_n_visited(self):
         return self.n_visited
-
-
-class Rectangle():
-    '''
-    Represents de rectangle to move in the laberinth
-    '''
-    def __init__(self):
-        self.axis = "X"
-        self.moves = 0
-
+    
     def rotate(self):
         if self.axis == "X":
             self.axis = "Y"
         else:
             self.axis = "X"
 
-    def update_move(self):
-        self.moves += 1
-
-    def clone(self):
-        rect = Rectangle()
-        rect.axis = self.axis
-        rect.moves = self.moves
-
+    def get_position(self):
+        return self.position
 
 ############################################################################################
 
@@ -91,47 +75,48 @@ def calc_vertice_neighbors(pos, n_last_row, n_last_col):
 ############################################################################################
 
 
-def create_laberinth_cell(lab, n_last_row, n_last_col):
-    wall_pos = []
+def create_laberinth_cell(n_last_row, n_last_col):
 
-    pos_exit = [n_last_row, n_last_col]
-
-    for n_row, row in enumerate(lab):
+    for n_row, row in enumerate(laberinth):
         for n_col, col in enumerate(row):
-            cell = Cell(col)
+            cell = Cell(col, n_row, n_col)
             pos = [n_row, n_col]
-            dist = calc_Manh_distance(pos, pos_exit)
 
             neigh = calc_cross_neighbors(pos, n_last_row, n_last_col)
 
-            if col == "#":
-                wall_pos.append(pos)
-
-            cell.set_distance(dist)
             cell.set_neighbors(neigh)
 
-            lab[n_row][n_col] = cell
+            laberinth[n_row][n_col] = cell
 
-    return lab, wall_pos
+def Possible_rotation_cells(pos, n_last_row, n_last_col):
+    
+    neighs = laberinth[i[0]][i[1]].get_neighbors(pos)
+    neighs += calc_vertice_neighbors(pos, n_last_row, n_last_col)
+    for j in neighs:
+        t = laberinth[j[0]][j[1]].get_type()
+        if t == "#":
+            return False
 
-def search_imposible_rotation_cells(lab, wall_pos, n_last_row, n_last_col):
-    for i in wall_pos:
-        neighs = lab[i[0]][i[1]].get_neighbors()
-        neighs += calc_vertice_neighbors(i, n_last_row, n_last_col)
-        for j in neighs:
-            lab[j[0]][j[1]].change_rotate()
-
-    return lab
+    return True
 
 
 ############################################################################################
 
 
-def A_Star(): 
+def A_Star(start, n_last_row, n_last_col): 
     '''
     Runs AStar algorithm to find the shortest path
     '''
-    pass
+
+    pos_exit = [n_last_row, n_last_col]
+    queue = [start]
+
+    for cell in queue:
+        poss = cell.get_possition()
+        if calc_Manh_distance(poss, pos_exit) == 1:
+            return cell.get_moves()
+
+    return None
 
 
 ############################################################################################
@@ -148,20 +133,11 @@ if __name__ == "__main__":
     n_last_row = len(laberinth)-1
     n_last_col = len(laberinth[-1])-1
 
-    laberinth, wall_pos = create_laberinth_cell(laberinth, n_last_row, n_last_col)
+    create_laberinth_cell(n_last_row, n_last_col)
 
     for i in laberinth:
         line = []
         for j in i:
-            line.append(j.rotate)
-        print(line)
-
-    print(wall_pos)
-    laberinth = search_imposible_rotation_cells(laberinth, wall_pos, n_last_row, n_last_col)
-
-    for i in laberinth:
-        line = []
-        for j in i:
-            line.append(j.rotate)
+            line.append(j.type)
         print(line)
 
