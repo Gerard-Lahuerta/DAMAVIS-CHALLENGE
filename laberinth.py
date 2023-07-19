@@ -32,7 +32,32 @@ class Cell():
     def get_n_visited(self):
         return self.n_visited
 
+
+class Rectangle():
+    '''
+    Represents de rectangle to move in the laberinth
+    '''
+    def __init__(self):
+        self.axis = "X"
+        self.moves = 0
+
+    def rotate(self):
+        if self.axis == "X":
+            self.axis = "Y"
+        else:
+            self.axis = "X"
+
+    def update_move(self):
+        self.moves += 1
+
+    def clone(self):
+        rect = Rectangle()
+        rect.axis = self.axis
+        rect.moves = self.moves
+
+
 ############################################################################################
+
 
 def calc_Manh_distance(pos, pos_exit): 
     '''
@@ -61,6 +86,9 @@ def calc_vertice_neighbors(pos, n_last_row, n_last_col):
                 continue
             neighs.append([X,Y])
     return neighs
+
+
+############################################################################################
 
 
 def create_laberinth_cell(lab, n_last_row, n_last_col):
@@ -96,12 +124,17 @@ def search_imposible_rotation_cells(lab, wall_pos, n_last_row, n_last_col):
     return lab
 
 
+############################################################################################
+
 
 def A_Star(): 
     '''
     Runs AStar algorithm to find the shortest path
     '''
     pass
+
+
+############################################################################################
 
 
 laberinth = [ ['.','.','.','.','.','.','.','.','.'],
