@@ -7,12 +7,12 @@ class Cell():
         self.neighbors = []
         self.visited = False
         self.n_visited = 0
-        self.moves = 0
+        self.moves = float("inf")
         self.axis = "X"
         self.position = [x,y]
         self.estimated_distance = upper_bound
 
-        self.path = []
+        self.before = []
     
     def set_neighbors(self, neighbors_position):
         self.neighbors = neighbors_position
@@ -148,8 +148,6 @@ def possible_rotation_cells(pos, n_last_row, n_last_col):
 
 
 def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
-    if neigh.get_visited():
-        return False
 
     if neigh.get_type() == "#":
         return False
@@ -166,12 +164,12 @@ def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
         if "#" in [laberinth[neigh_pos[0]+1][neigh_pos[1]].get_type(), laberinth[neigh_pos[0]-1][neigh_pos[1]].get_type()]:
             return False
 
-    if cell.get_moves() + dist + 1 > neigh.get_estimate_distance():
+    if cell.get_moves() + 1 > neigh.moves:
         return False   
     
     return True
 
-def expand(cell, pos_exit, n_last_row, n_last_col):
+def expand(cell, pos_exit, n_last_row, n_last_col, queue):
 
     add_to_queue = []
 
@@ -180,13 +178,13 @@ def expand(cell, pos_exit, n_last_row, n_last_col):
         pos = cell.get_position()
         dist = calc_Manh_distance(pos, pos_exit)
         
-        if conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):    
+        if conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):  
+
             neigh.set_moves(cell.get_moves() + 1)
             neigh.set_estimated_distance(dist)
             neigh.set_rotation(cell.get_rotation())
-            neigh.path = cell.path
-            neigh.path.append(cell.position)
-
+            neigh.before = cell.get_position()
+            
             add_to_queue.append(neigh)
     
     return add_to_queue
@@ -196,6 +194,7 @@ def A_Star(start, n_last_row, n_last_col):
     Runs AStar algorithm to find the shortest path
     '''
 
+    start.set_moves(0)
     pos_exit = [n_last_row, n_last_col]
     queue = [start]
 
@@ -208,13 +207,13 @@ def A_Star(start, n_last_row, n_last_col):
         if calc_Manh_distance(pos, pos_exit) == 1:
             return cell.get_moves()
         
-        queue += expand(cell, pos_exit, n_last_row, n_last_col)
+        queue += expand(cell, pos_exit, n_last_row, n_last_col, queue)
 
         if possible_rotation_cells(pos, n_last_row, n_last_col):
             cell.rotate()
-            queue += expand(cell, pos_exit, n_last_row, n_last_col)
+            queue += expand(cell, pos_exit, n_last_row, n_last_col, queue)
 
-        queue.sort(key=lambda c: c.moves, reverse = True)
+        queue.sort(key=lambda c: c.estimated_distance, reverse = True)
 
         '''
         print(len(queue))
@@ -230,7 +229,7 @@ def A_Star(start, n_last_row, n_last_col):
 
 
 ############################################################################################
-
+'''
 laberinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".","#",".",".",".",".","#",".",".","."],
               [".","#",".",".",".",".",".",".",".","."],
@@ -241,7 +240,7 @@ laberinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".","#",".",".","."],
               [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".",".",".",".","." ] ]
-
+'''
 '''
 laberinth =[ [".",".","."],
              [".",".","."],
