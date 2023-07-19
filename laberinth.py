@@ -68,10 +68,10 @@ class Cell():
         return self.estimated_distance
     
     def set_rotation(self, rot):
-        self.rotate = rot
+        self.axis = rot
 
     def get_rotation(self):
-        return self.rotate
+        return self.axis
     
     def get_type(self):
         return self.type
@@ -154,21 +154,24 @@ def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
     if neigh.get_type() == "#":
         return False
 
-    if neigh_pos[0]+1> n_last_col or neigh_pos[0]-1< 0:
-        return False
-
-    if neigh_pos[1]+1 > n_last_row or neigh_pos[1]-1< 0:
-        return False
+    print(cell.get_rotation())
 
     if cell.get_rotation() == "X":
-        if laberinth[neigh_pos[1]][neigh_pos[0]+1].get_type() or laberinth[neigh_pos[1]][neigh_pos[0]-1].get_type() == "#":
+        if neigh_pos[1]+1 > n_last_col or neigh_pos[1]-1< 0:
+            return False
+
+        if "#" in [laberinth[neigh_pos[0]][neigh_pos[1]+1].get_type(), laberinth[neigh_pos[0]][neigh_pos[1]-1].get_type()]:
             return False
     else:
-        if laberinth[neigh_pos[1]+1][neigh_pos[0]].get_type() or laberinth[neigh_pos[1]-1][neigh_pos[0]].get_type() == "#":
+        if neigh_pos[0]+1> n_last_row or neigh_pos[0]-1< 0:
+            return False
+        if "#" in [laberinth[neigh_pos[0]+1][neigh_pos[1]].get_type(), laberinth[neigh_pos[0]-1][neigh_pos[1]].get_type()]:
             return False
 
     if cell.get_moves() + dist + 1 > neigh.get_estimate_distance():
         return False   
+    
+    return True
 
 def expand(cell, pos_exit, n_last_row, n_last_col):
 
@@ -216,13 +219,13 @@ def A_Star(start, n_last_row, n_last_col):
 
         queue.sort(key=lambda c: c.estimated_distance, reverse = True)
 
-        '''
+
         print(len(queue))
         l = []
         for i in queue:
             l.append(i.position)
         print(l)
-        '''
+        
         
 
     return -1
@@ -230,12 +233,36 @@ def A_Star(start, n_last_row, n_last_col):
 
 ############################################################################################
 
+laberinth = [ [".",".",".",".",".",".",".",".",".","."],
+              [".","#",".",".",".",".","#",".",".","."],
+              [".","#",".",".",".",".",".",".",".","."],
+              [".",".",".",".",".",".",".",".",".","."],
+              [".",".",".",".",".",".",".",".",".","."],
+              [".","#",".",".",".",".",".",".",".","."],
+              [".","#",".",".",".","#",".",".",".","."],
+              [".",".",".",".",".",".","#",".",".","."],
+              [".",".",".",".",".",".",".",".",".","."],
+              [".",".",".",".",".",".",".",".",".","." ]]
 
+'''
+laberinth =[ [".",".","."],
+             [".",".","."],
+             [".",".","."] ]
+'''
+'''
 laberinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['#','.','.','.','#','.','.','#','.'],
               ['.','.','.','.','#','.','.','.','.'],
               ['.','#','.','.','.','.','.','#','.'],
               ['.','#','.','.','.','.','.','#','.'] ]
+'''
+'''
+laberinth = [ ['.','.','.','.','.','.','.','.','.'],
+              ['#','.','.','.','#','.','.','.','.'],
+              ['.','.','.','.','#','.','.','.','.'],
+              ['.','#','.','.','.','.','.','#','.'],
+              ['.','#','.','.','.','.','.','#','.'] ]
+'''
 
 if __name__ == "__main__":
 
