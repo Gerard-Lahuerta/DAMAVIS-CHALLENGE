@@ -13,8 +13,11 @@ class Cell():
     def set_distance(self, dist):
         self.distance = dist
     
-    def set_neighbor(self, neighbors_position):
-        self.neighbors.append(neighbors_position)
+    def set_neighbors(self, neighbors_position):
+        self.neighbors = neighbors_position
+
+    def get_neighbors(self):
+        return self.neighbors
     
     def change_rotate(self):
         self.rotate = False
@@ -48,9 +51,19 @@ def calc_cross_neighbors(pos, n_last_row, n_last_col):
             neighs.append([X,Y])
     return neighs
 
-def create_laberinth_cell(lab):
-    n_last_row = len(lab)-1
-    n_last_col = len(lab[-1])-1
+def calc_vertice_neighbors(pos, n_last_row, n_last_col):
+    neighs = []
+    for i in [1,-1]:
+        for j in [1,-1]:
+            X = pos[0]+i
+            Y = pos[1]+j
+            if X > n_last_row or X < 0 or Y > n_last_col or Y < 0:
+                continue
+            neighs.append([X,Y])
+    return neighs
+
+
+def create_laberinth_cell(lab, n_last_row, n_last_col):
     wall_pos = []
 
     pos_exit = [n_last_row, n_last_col]
@@ -67,11 +80,21 @@ def create_laberinth_cell(lab):
                 wall_pos.append(pos)
 
             cell.set_distance(dist)
-            cell.set_neighbor(neigh)
+            cell.set_neighbors(neigh)
 
             lab[n_row][n_col] = cell
 
     return lab, wall_pos
+
+def search_imposible_rotation_cells(lab, wall_pos, n_last_row, n_last_col):
+    for i in wall_pos:
+        neighs = lab[i[0]][i[1]].get_neighbors()
+        neighs += calc_vertice_neighbors(i, n_last_row, n_last_col)
+        for j in neighs:
+            lab[j[0]][j[1]].change_rotate()
+
+    return lab
+
 
 
 def A_Star(): 
@@ -88,12 +111,24 @@ laberinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['.','#','.','.','.','.','.','#','.'] ]
 
 if __name__ == "__main__":
-    laberinth, _ = create_laberinth_cell(laberinth)
+
+    n_last_row = len(laberinth)-1
+    n_last_col = len(laberinth[-1])-1
+
+    laberinth, wall_pos = create_laberinth_cell(laberinth, n_last_row, n_last_col)
 
     for i in laberinth:
         line = []
         for j in i:
-            line.append(j.type)
+            line.append(j.rotate)
         print(line)
-    print(len(_))
+
+    print(wall_pos)
+    laberinth = search_imposible_rotation_cells(laberinth, wall_pos, n_last_row, n_last_col)
+
+    for i in laberinth:
+        line = []
+        for j in i:
+            line.append(j.rotate)
+        print(line)
 
