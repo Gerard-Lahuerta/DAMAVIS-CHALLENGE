@@ -35,14 +35,14 @@ def calc_Manh_distance(pos, pos_exit):
     '''
     Calculates de Manhattan distance
     '''
-    return sum(pos_exit-pos)
+    return sum(pos_exit)-sum(pos)
 
-def calc_neighbors(pos, n_last_row, n_last_col):
+def calc_cross_neighbors(pos, n_last_row, n_last_col):
     neighs = []
-    for x,i in enumerate([1,-1]):
-        for y,j in enumerate([1,-1]):
-            X = pos[x]+i
-            Y = pos[y]+j
+
+    for i in ([1,0],[-1,0],[0,1],[0,-1]):
+            X = pos[0]+i[0]
+            Y = pos[1]+i[1]
             if X > n_last_row or X < 0 or Y > n_last_col or Y < 0:
                 continue
             neighs.append([X,Y])
@@ -51,19 +51,27 @@ def calc_neighbors(pos, n_last_row, n_last_col):
 def create_laberinth_cell(lab):
     n_last_row = len(lab)-1
     n_last_col = len(lab[-1])-1
+    wall_pos = []
 
     pos_exit = [n_last_row, n_last_col]
 
     for n_row, row in enumerate(lab):
-        for n_col, col in row:
+        for n_col, col in enumerate(row):
             cell = Cell(col)
             pos = [n_row, n_col]
             dist = calc_Manh_distance(pos, pos_exit)
 
-            neigh = calc_neighbors(pos, n_last_row, n_last_col)
+            neigh = calc_cross_neighbors(pos, n_last_row, n_last_col)
 
             if col == "#":
-                wall_neigh_pos += neigh
+                wall_pos.append(pos)
+
+            cell.set_distance(dist)
+            cell.set_neighbor(neigh)
+
+            lab[n_row][n_col] = cell
+
+    return lab, wall_pos
 
 
 def A_Star(): 
@@ -80,4 +88,12 @@ laberinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['.','#','.','.','.','.','.','#','.'] ]
 
 if __name__ == "__main__":
-    create_laberinth_cell(laberinth)
+    laberinth, _ = create_laberinth_cell(laberinth)
+
+    for i in laberinth:
+        line = []
+        for j in i:
+            line.append(j.type)
+        print(line)
+    print(len(_))
+
