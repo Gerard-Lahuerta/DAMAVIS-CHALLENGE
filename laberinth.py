@@ -2,7 +2,7 @@ class Cell():
     '''
     Represents de cells of the laberinth
     '''
-    def __init__(self, type, x, y):
+    def __init__(self, type, x, y, upper_bound):
         self.type = type
         self.neighbors = []
         self.visited = False
@@ -10,7 +10,7 @@ class Cell():
         self.moves = 0
         self.axis = "X"
         self.position = [x,y]
-        self.estimated_distance = 0
+        self.estimated_distance = upper_bound
     
     def set_neighbors(self, neighbors_position):
         self.neighbors = neighbors_position
@@ -53,6 +53,9 @@ class Cell():
     def update_estimated_distance(self, dist):
         self.estimated_distance = self.moves + dist
 
+    def get_visited(self):
+        return self.visited
+
 ############################################################################################
 
 
@@ -90,14 +93,17 @@ def calc_vertice_neighbors(pos, n_last_row, n_last_col):
 
 def create_laberinth_cell(n_last_row, n_last_col):
 
+    upper_bound = (n_last_col+1)*n_last_row
+
     for n_row, row in enumerate(laberinth):
         for n_col, col in enumerate(row):
-            cell = Cell(col, n_row, n_col)
+            cell = Cell(col, n_row, n_col, upper_bound)
             pos = [n_row, n_col]
 
             neigh = calc_cross_neighbors(pos, n_last_row, n_last_col)
 
             cell.set_neighbors(neigh)
+            cell.set_estimate_distance = float("inf")
 
             laberinth[n_row][n_col] = cell
 
@@ -116,7 +122,26 @@ def possible_rotation_cells(pos, n_last_row, n_last_col):
 ############################################################################################
 
 
-def expand(cell):
+def expand(cell, pos_exit):
+
+    add_to_queue = []
+
+    for neigh in cell.get_neighbors():
+        if neigh.get_visited():
+            continue
+
+        if cell.get_moves + dist + 1 > neigh.get_estimate_distance():
+            continue
+
+        pos = cell.get_position()
+        dist = calc_Manh_distance(pos, pos_exit)
+
+        neigh.set_estimate_distance(dist)
+        neigh.set_moves(cell.get_moves + 1)
+        neigh.set_rotation(cell.get_rotation())
+
+        add_to_queue.append(neigh)
+    
     pass
 
 def A_Star(start, n_last_row, n_last_col): 
@@ -134,17 +159,17 @@ def A_Star(start, n_last_row, n_last_col):
         if calc_Manh_distance(pos, pos_exit) == 1:
             return cell.get_moves()
         
-        queue += expand(cell)
+        queue += expand(cell, pos_exit)
 
         if possible_rotation_cells(pos, n_last_row, n_last_col):
             cell.rotate()
-            queue += expand(cell)
+            queue += expand(cell, pos_exit)
 
         queue.sort(key=lambda c: c.estimated_distance)
 
         
 
-    return None
+    return -1
 
 
 ############################################################################################
@@ -168,4 +193,6 @@ if __name__ == "__main__":
         for j in i:
             line.append(j.type)
         print(line)
+
+    print(A_Star(laberinth[0][1], n_last_row, n_last_col))
 
