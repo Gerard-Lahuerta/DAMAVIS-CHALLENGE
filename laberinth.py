@@ -30,8 +30,8 @@ class Cell():
         neigh = self.neighbors[self.n_visited//2]
         return neigh
     
-    def update_n_visited(self):
-        self.n_visited += 1
+    def update_moves(self):
+        self.moves += 1
     
     def get_n_visited(self):
         return self.n_visited
@@ -41,7 +41,7 @@ class Cell():
             self.axis = "Y"
         else:
             self.axis = "X"
-        self.update_n_visited()
+        self.update_moves()
 
     def get_position(self):
         return self.position
@@ -84,7 +84,7 @@ def calc_Manh_distance(pos, pos_exit):
     '''
     Calculates de Manhattan distance
     '''
-    return sum(pos_exit)-sum(pos)
+    return abs(sum(pos_exit)-sum(pos))
 
 def calc_cross_neighbors(pos, n_last_row, n_last_col):
     neighs = []
@@ -167,6 +167,9 @@ def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
     if cell.get_moves() + 1 > neigh.moves:
         return False   
     
+    if calc_Manh_distance(cell.get_position(), neigh_pos) > 1:
+        return False
+    
     return True
 
 def expand(cell, pos_exit, n_last_row, n_last_col, queue):
@@ -179,8 +182,7 @@ def expand(cell, pos_exit, n_last_row, n_last_col, queue):
         dist = calc_Manh_distance(pos, pos_exit)
         
         if conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):  
-
-            neigh.set_moves(cell.get_moves() + 1)
+            neigh.set_moves(cell.get_moves() + 1)#+ calc_Manh_distance(pos, neigh_pos) )
             neigh.set_estimated_distance(dist)
             neigh.set_rotation(cell.get_rotation())
             neigh.before = cell.get_position()
@@ -213,7 +215,7 @@ def A_Star(start, n_last_row, n_last_col):
             cell.rotate()
             queue += expand(cell, pos_exit, n_last_row, n_last_col, queue)
 
-        queue.sort(key=lambda c: c.estimated_distance, reverse = True)
+        queue.sort(key=lambda c: c.estimated_distance)#, reverse = True)
 
         '''
         print(len(queue))
@@ -278,4 +280,16 @@ if __name__ == "__main__":
         print(line)
 
     print(A_Star(laberinth[0][1], n_last_row, n_last_col))
+    
+    if len(laberinth[-2][-1].before) != 0:
+        cell = laberinth[-2][-1]
+    else :
+        cell = laberinth[-1][-2]
+    print(cell.position)
+
+    while len(cell.before) != 0:
+        print(cell.before)
+        cell = laberinth[cell.before[0]][cell.before[1]]
+
+    print(laberinth[1][8].before)
 
