@@ -154,8 +154,6 @@ def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
     if neigh.get_type() == "#":
         return False
 
-    print(cell.get_rotation())
-
     if cell.get_rotation() == "X":
         if neigh_pos[1]+1 > n_last_col or neigh_pos[1]-1< 0:
             return False
@@ -208,7 +206,6 @@ def A_Star(start, n_last_row, n_last_col):
 
         pos = cell.get_position()
         if calc_Manh_distance(pos, pos_exit) == 1:
-            print(cell.path)
             return cell.get_moves()
         
         queue += expand(cell, pos_exit, n_last_row, n_last_col)
@@ -217,14 +214,15 @@ def A_Star(start, n_last_row, n_last_col):
             cell.rotate()
             queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
-        queue.sort(key=lambda c: c.estimated_distance, reverse = True)
+        queue.sort(key=lambda c: c.moves, reverse = True)
 
-
+        '''
         print(len(queue))
         l = []
         for i in queue:
             l.append(i.position)
         print(l)
+        '''
         
         
 
@@ -242,7 +240,7 @@ laberinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".","#",".",".",".","#",".",".",".","."],
               [".",".",".",".",".",".","#",".",".","."],
               [".",".",".",".",".",".",".",".",".","."],
-              [".",".",".",".",".",".",".",".",".","." ]]
+              [".",".",".",".",".",".",".",".",".","." ] ]
 
 '''
 laberinth =[ [".",".","."],
@@ -265,6 +263,9 @@ laberinth = [ ['.','.','.','.','.','.','.','.','.'],
 '''
 
 if __name__ == "__main__":
+
+    assert len(laberinth) in range(3,1000), "ERROR: number of columns not accepted. Needs to be between 3 and 1000."
+    assert len(laberinth[-1]) in range(3,1000), "ERROR: number of rows not accepted. Needs to be between 3 and 1000."
 
     n_last_row = len(laberinth)-1
     n_last_col = len(laberinth[-1])-1
