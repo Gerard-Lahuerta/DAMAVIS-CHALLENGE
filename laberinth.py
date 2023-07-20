@@ -4,7 +4,7 @@ DAMAVIS CHALLENGE PROGRAM PROPORSAL
 @Author: Gerard Lahuerta Martín
 @Date: 20/07/2023
 
-The program is separated in classes needed to run the search algorithm, auxiliar fucntions to calculate 
+The program is separated in classes needed to run the search algorithm, auxiliar functions to calculate 
 relevant data, functions that translate the input ( list(list(str)) ) into the structure needed to run the
 search algorithm and the algorithm, the algorithm and the main program with the global variable labyrinth 
 (the input of the program).
@@ -27,7 +27,7 @@ class Cell():
     Attributes:
       - type: character that represents the type of the cell (wall "#" or free ".").
       - neighbors: list of coordinates of its cells neighbors.
-      - moves: integuer that count the moves done while its in the cell.
+      - moves: integuer that counts the moves done while its in the cell.
       - axis: character that represents the orientation of the rectangle (horizontal "X" or vertical "Y").
       - position: lest with the coordinates of the cell.
     '''
@@ -387,13 +387,12 @@ def A_Star(start, n_last_row, n_last_col):
             cell.rotate()
             queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
-        queue.sort(key=lambda c: c.estimated_distance) 
+        queue.sort(key=lambda c: c.estimated_distance) # Add the possible moves to the 
 
     return -1
 
 
 ############################################################################################
-
 
 # TEST 4
 

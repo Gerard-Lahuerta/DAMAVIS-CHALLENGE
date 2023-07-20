@@ -30,6 +30,6 @@ The time to obtain the result is negligible in the biggest test (test 4) and com
 In case of continue developing this program recomend to take into consideration the considerations and ideas proposed in the before section.
 
 
-## Authors
+## Author
 - [Gerard Lahuerta Martin](https://es.linkedin.com/in/gerard-lahuerta-mart%C3%ADn)
 
