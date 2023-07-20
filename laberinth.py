@@ -185,6 +185,7 @@ def calc_cross_neighbors(pos, n_last_row, n_last_col):
             X = pos[0]+i[0]
             Y = pos[1]+i[1]
             if X > n_last_row or X < 0 or Y > n_last_col or Y < 0:
+                # If the neighbor position is not in the limits of the laberinth, ignore
                 continue
             neighs.append([X,Y])
     return neighs
@@ -207,6 +208,7 @@ def calc_vertice_neighbors(pos, n_last_row, n_last_col):
             X = pos[0]+i
             Y = pos[1]+j
             if X > n_last_row or X < 0 or Y > n_last_col or Y < 0:
+                # If the neighbor position is not in the limits of the laberinth, ignore
                 continue
             neighs.append([X,Y])
     return neighs
@@ -227,7 +229,7 @@ def create_labyrinth_cell(n_last_row, n_last_col):
       - The variable labyrinth will be overwritten changing the characters with the cells.
     '''
 
-    upper_bound = (n_last_col+1)*n_last_row
+    upper_bound = n_last_col*n_last_row
 
     for n_row, row in enumerate(labyrinth):
         for n_col, col in enumerate(row):
@@ -235,9 +237,7 @@ def create_labyrinth_cell(n_last_row, n_last_col):
             pos = [n_row, n_col]
 
             neigh = calc_cross_neighbors(pos, n_last_row, n_last_col)
-
             cell.set_neighbors(neigh)
-            cell.set_estimate_distance = float("inf")
 
             labyrinth[n_row][n_col] = cell
 
@@ -261,11 +261,13 @@ def possible_rotation_cells(pos, n_last_row, n_last_col):
     neighs += calc_vertice_neighbors(pos, n_last_row, n_last_col)
 
     if len(neighs) != 8:
+        # If the cell is in the border of the laberynth cannot rotate
         return False
 
     for j in neighs:
         t = labyrinth[j[0]][j[1]].get_type()
         if t == "#":
+            # If the neighbor is a wall cannot rotate
             return False
 
     return True
@@ -285,26 +287,35 @@ def conditions_needed(cell, neigh, n_last_row, n_last_col):
       - bool.
     '''
     if neigh.get_type() == "#":
+        # If the neighbor is a wall, impossible to move.
         return False
 
     if cell.get_rotation() == "X":
+        # Restrictions if the rectangle is in an horizontal position.
         if neigh.position[1]+1 > n_last_col or neigh.position[1]-1< 0:
+            # If one of the extrems of the rectangle is going to be "outsite" the labyrinth.
             return False
 
         if "#" in [labyrinth[neigh.position[0]][neigh.position[1]+1].get_type(), 
                    labyrinth[neigh.position[0]][neigh.position[1]-1].get_type()]:
+            # If one of the neighbors of the cell thats going to move is a wall.
             return False
     else:
+        # Restrictions if the rectangle is in an vertical position.
         if neigh.position[0]+1> n_last_row or neigh.position[0]-1< 0:
+            # If one of the extrems of the rectangle is going to be "outsite" the labyrinth.
             return False
         if "#" in [labyrinth[neigh.position[0]+1][neigh.position[1]].get_type(), 
                    labyrinth[neigh.position[0]-1][neigh.position[1]].get_type()]:
+            # If one of the neighbors of the cell thats going to move is a wall.
             return False
 
     if cell.get_moves() + 1 > neigh.moves:
+        # If the moves done to arribe at the cell are more than done before do not move.
         return False   
     
     if calc_Manh_distance(cell.get_position(), neigh.position) > 1:
+        # If the move is in diagonal (illegal move), do not move.
         return False
     
     return True
@@ -326,10 +337,11 @@ def expand(cell, pos_exit, n_last_row, n_last_col):
 
     for neigh_pos in cell.get_neighbors():
         neigh = labyrinth[neigh_pos[0]][neigh_pos[1]]
-        pos = cell.get_position()
-        dist = calc_Manh_distance(pos, pos_exit)
-        
+                
         if conditions_needed(cell, neigh, n_last_row, n_last_col):  
+            pos = neigh.get_position()
+            dist = calc_Manh_distance(pos, pos_exit)
+
             neigh.set_moves(cell.get_moves() + 1)
             neigh.set_estimated_distance(dist)
             neigh.set_rotation(cell.get_rotation())
@@ -359,21 +371,23 @@ def A_Star(start, n_last_row, n_last_col):
     pos_exit = [n_last_row, n_last_col]
     queue = [start]
 
-    while len(queue) != 0: # and count < 10:
+    while len(queue) != 0: 
         cell = queue[0]
         queue = queue[1:]
 
         pos = cell.get_position()
         if calc_Manh_distance(pos, pos_exit) == 1:
+            # If the center of the rectangle is neighbor of the exit, we finish
             return cell.get_moves()
         
         queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
         if possible_rotation_cells(pos, n_last_row, n_last_col):
+            # If its possible to rotate the rectangle, we expand again rotated
             cell.rotate()
             queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
-        queue.sort(key=lambda c: c.estimated_distance)#, reverse = True)    
+        queue.sort(key=lambda c: c.estimated_distance) 
 
     return -1
 
@@ -381,6 +395,7 @@ def A_Star(start, n_last_row, n_last_col):
 ############################################################################################
 
 # TEST 4
+
 labyrinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".","#",".",".",".",".","#",".",".","."],
               [".","#",".",".",".",".",".",".",".","."],
@@ -391,6 +406,7 @@ labyrinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".","#",".",".","."],
               [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".",".",".",".","." ] ]
+
 
 
 # TEST 3
