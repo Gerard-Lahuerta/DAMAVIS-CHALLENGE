@@ -1,6 +1,22 @@
+'''
+DAMAVIS CHALLENGE PROGRAM PROPORSAL
+
+@Author: Gerard Lahuerta Martín
+@Date: 20/07/2023
+
+The program is separated in classes needed to run the search algorithm, auxiliar fucntions 
+to calculate rellevant data, function that translate the input ( list(list(str)) ) into 
+the structure needed to run the search algorithm and the algorithm.
+
+For more information about the algorithms and explanations of the decisions done while 
+programming the program consult the Readme file.
+'''
+
+############################################################################################
+
 class Cell(): 
     '''
-    Represents de cells of the labyrinth
+    Class Object that represents de cells of the labyrinth
     '''
     def __init__(self, type, x, y, upper_bound):
         self.type = type
@@ -98,6 +114,10 @@ def create_labyrinth_cell(n_last_row, n_last_col):
 
             labyrinth[n_row][n_col] = cell
 
+
+############################################################################################
+
+
 def possible_rotation_cells(pos, n_last_row, n_last_col):
     
     neighs = labyrinth[pos[0]][pos[1]].get_neighbors()
@@ -114,9 +134,6 @@ def possible_rotation_cells(pos, n_last_row, n_last_col):
     return True
 
 
-############################################################################################
-
-
 def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
 
     if neigh.get_type() == "#":
@@ -126,12 +143,14 @@ def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
         if neigh_pos[1]+1 > n_last_col or neigh_pos[1]-1< 0:
             return False
 
-        if "#" in [labyrinth[neigh_pos[0]][neigh_pos[1]+1].get_type(), labyrinth[neigh_pos[0]][neigh_pos[1]-1].get_type()]:
+        if "#" in [labyrinth[neigh_pos[0]][neigh_pos[1]+1].get_type(), 
+                   labyrinth[neigh_pos[0]][neigh_pos[1]-1].get_type()]:
             return False
     else:
         if neigh_pos[0]+1> n_last_row or neigh_pos[0]-1< 0:
             return False
-        if "#" in [labyrinth[neigh_pos[0]+1][neigh_pos[1]].get_type(), labyrinth[neigh_pos[0]-1][neigh_pos[1]].get_type()]:
+        if "#" in [labyrinth[neigh_pos[0]+1][neigh_pos[1]].get_type(), 
+                   labyrinth[neigh_pos[0]-1][neigh_pos[1]].get_type()]:
             return False
 
     if cell.get_moves() + 1 > neigh.moves:
@@ -152,7 +171,7 @@ def expand(cell, pos_exit, n_last_row, n_last_col, queue):
         dist = calc_Manh_distance(pos, pos_exit)
         
         if conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):  
-            neigh.set_moves(cell.get_moves() + 1)#+ calc_Manh_distance(pos, neigh_pos) )
+            neigh.set_moves(cell.get_moves() + 1)
             neigh.set_estimated_distance(dist)
             neigh.set_rotation(cell.get_rotation())
             neigh.before = cell.get_position()
