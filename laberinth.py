@@ -31,6 +31,7 @@ class Cell():
       - axis: character that represents the orientation of the rectangle (horizontal "X" or vertical "Y").
       - position: lest with the coordinates of the cell.
     '''
+    
     def __init__(self, type, x, y, upper_bound):
         '''
         Inicialice the Cell class.
@@ -85,7 +86,7 @@ class Cell():
         Returns the position of the cell in the "labyrinth map".
 
         Return:
-          - position: list
+          - position: list.
         '''
         return self.position
 
@@ -106,7 +107,7 @@ class Cell():
         Returns the moves the rectangle have done to arribe at the cell.
 
         Return:
-          - moves: integuer
+          - moves: integuer.
         '''
         return self.moves
     
@@ -136,16 +137,16 @@ class Cell():
         Returns the orientation of the rectangle that is in the cell.
 
         Return:
-          - axis: character
+          - axis: character.
         '''
         return self.axis
     
     def get_type(self):
         '''
-        Returns the type of the cell
+        Returns the type of the cell.
 
         Return:
-          - type: character
+          - type: character.
         '''
         return self.type
 
@@ -155,28 +156,28 @@ class Cell():
 
 def calc_Manh_distance(init_pos, end_pos): 
     '''
-    Calculates de Manhattan distance between two cells
+    Calculates de Manhattan distance between two cells.
 
     Args:
-      - init_pos: list with the coordinates of the init cell
-      - end_pos: list with the coordinates of the end cell
+      - init_pos: list with the coordinates of the init cell.
+      - end_pos: list with the coordinates of the end cell.
 
     Return:
-      - float
+      - float.
     '''
     return abs(sum(end_pos)-sum(init_pos))
 
 def calc_cross_neighbors(pos, n_last_row, n_last_col):
     '''
-    Calculates the lateral neighbors of a cell
+    Calculates the lateral neighbors of a cell.
 
     Args:
-      - pos: list with the coordinates of the cell
-      - n_last_row: integuer that represents the last row of the labyrinth
-      - n_last_col: inetguer that represents the last column of the labyrinth 
+      - pos: list with the coordinates of the cell.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth. 
 
     Retun:
-      - list with the neighbors coordinates
+      - list with the neighbors coordinates.
     '''
     neighs = []
 
@@ -190,15 +191,15 @@ def calc_cross_neighbors(pos, n_last_row, n_last_col):
 
 def calc_vertice_neighbors(pos, n_last_row, n_last_col):
     '''
-    Calculates the diagonal neighbors of a cell
+    Calculates the diagonal neighbors of a cell.
 
     Args:
-      - pos: list with the coordinates of the cell
-      - n_last_row: integuer that represents the last row of the labyrinth
-      - n_last_col: inetguer that represents the last column of the labyrinth 
+      - pos: list with the coordinates of the cell.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
 
     Retun:
-      - list with the neighbors coordinates
+      - list with the neighbors coordinates.
     '''
     neighs = []
     for i in [1,-1]:
@@ -219,7 +220,11 @@ def create_labyrinth_cell(n_last_row, n_last_col):
     Creates the cells and recreates the laberynth with them.
 
     Args:
-      - 
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
+
+    Rellevant Information:
+      - The variable labyrinth will be overwritten changing the characters with the cells.
     '''
 
     upper_bound = (n_last_col+1)*n_last_row
