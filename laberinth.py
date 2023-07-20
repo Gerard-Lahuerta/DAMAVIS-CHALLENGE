@@ -5,7 +5,7 @@ DAMAVIS CHALLENGE PROGRAM PROPORSAL
 @Date: 20/07/2023
 
 The program is separated in classes needed to run the search algorithm, auxiliar fucntions to calculate 
-rellevant data, functions that translate the input ( list(list(str)) ) into the structure needed to run the
+relevant data, functions that translate the input ( list(list(str)) ) into the structure needed to run the
 search algorithm and the algorithm, the algorithm and the main program with the global variable labyrinth 
 (the input of the program).
 
@@ -21,7 +21,7 @@ class Cell():
     '''
     Class Object that represents de cells of the labyrinth.
 
-    It contains the rellevant information obtained in the input "labyinth map". 
+    It contains the Relevant information obtained in the input "labyinth map". 
     Also contains important information for the searching algorithm.
 
     Attributes:
@@ -31,7 +31,7 @@ class Cell():
       - axis: character that represents the orientation of the rectangle (horizontal "X" or vertical "Y").
       - position: lest with the coordinates of the cell.
     '''
-    
+
     def __init__(self, type, x, y, upper_bound):
         '''
         Inicialice the Cell class.
@@ -42,7 +42,7 @@ class Cell():
           - y: integuer which represents the column where the cell its found.
           - upper_bound: integuer which is the maximum number of moves that the rectangle could do.
 
-        Rellevant information:
+        Relevant information:
           - Attribute axis will be inicialiced in horizontal, "X".
           - Attribute moves will be inicialiced as infinite. 
         '''
@@ -72,7 +72,7 @@ class Cell():
         '''
         Update the orientation of the rectangle that is in the cell.
 
-        Rellevant information:
+        Relevant information:
           - Rotate the rectangle is consider a moves, so the attribute moves will be increased in 1.
         '''
         if self.axis == "X":
@@ -97,7 +97,7 @@ class Cell():
         Args:
           - dist: integuer that represents the estimation of moves to complete the labyrinth.
 
-        Rellevant information:
+        Relevant information:
           - Is important to have the moves updated to register the real estimated distance.
         '''
         self.estimated_distance = self.moves + dist
@@ -127,7 +127,7 @@ class Cell():
         Args:
           - rot: character that represents the orientation of the rectangle.
 
-        Rellevant information:
+        Relevant information:
           - rot needs to be "#" or ".".
         '''
         self.axis = rot
@@ -223,7 +223,7 @@ def create_labyrinth_cell(n_last_row, n_last_col):
       - n_last_row: integuer that represents the last row of the labyrinth.
       - n_last_col: inetguer that represents the last column of the labyrinth.
 
-    Rellevant Information:
+    Relevant Information:
       - The variable labyrinth will be overwritten changing the characters with the cells.
     '''
 
@@ -246,7 +246,17 @@ def create_labyrinth_cell(n_last_row, n_last_col):
 
 
 def possible_rotation_cells(pos, n_last_row, n_last_col):
-    
+    '''
+    Determines if its possible to rotate the rectangle in the cell.
+
+    Args:
+      - pos: list with the coordinates of the cell.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
+
+    Return:
+      - bool.
+    '''
     neighs = labyrinth[pos[0]][pos[1]].get_neighbors()
     neighs += calc_vertice_neighbors(pos, n_last_row, n_last_col)
 
@@ -261,35 +271,57 @@ def possible_rotation_cells(pos, n_last_row, n_last_col):
     return True
 
 
-def conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):
+def conditions_needed(cell, neigh, n_last_row, n_last_col):
+    '''
+    Makes sure that the next move is possible.
 
+    Args:
+      - cell: Cell object that represents the actual cell.
+      - neigh: Cell object that represents the neighbor cell to move.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
+
+    Return:
+      - bool.
+    '''
     if neigh.get_type() == "#":
         return False
 
     if cell.get_rotation() == "X":
-        if neigh_pos[1]+1 > n_last_col or neigh_pos[1]-1< 0:
+        if neigh.position[1]+1 > n_last_col or neigh.position[1]-1< 0:
             return False
 
-        if "#" in [labyrinth[neigh_pos[0]][neigh_pos[1]+1].get_type(), 
-                   labyrinth[neigh_pos[0]][neigh_pos[1]-1].get_type()]:
+        if "#" in [labyrinth[neigh.position[0]][neigh.position[1]+1].get_type(), 
+                   labyrinth[neigh.position[0]][neigh.position[1]-1].get_type()]:
             return False
     else:
-        if neigh_pos[0]+1> n_last_row or neigh_pos[0]-1< 0:
+        if neigh.position[0]+1> n_last_row or neigh.position[0]-1< 0:
             return False
-        if "#" in [labyrinth[neigh_pos[0]+1][neigh_pos[1]].get_type(), 
-                   labyrinth[neigh_pos[0]-1][neigh_pos[1]].get_type()]:
+        if "#" in [labyrinth[neigh.position[0]+1][neigh.position[1]].get_type(), 
+                   labyrinth[neigh.position[0]-1][neigh.position[1]].get_type()]:
             return False
 
     if cell.get_moves() + 1 > neigh.moves:
         return False   
     
-    if calc_Manh_distance(cell.get_position(), neigh_pos) > 1:
+    if calc_Manh_distance(cell.get_position(), neigh.position) > 1:
         return False
     
     return True
 
-def expand(cell, pos_exit, n_last_row, n_last_col, queue):
+def expand(cell, pos_exit, n_last_row, n_last_col):
+    '''
+    Expans the cell, visits its neighbors
 
+    Args:
+      - cell: Cell object that represents the actual cell.
+      - pos_exit: coordinates of the exit.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
+
+    Return:
+      - list with the possible moves.
+    '''
     add_to_queue = []
 
     for neigh_pos in cell.get_neighbors():
@@ -297,7 +329,7 @@ def expand(cell, pos_exit, n_last_row, n_last_col, queue):
         pos = cell.get_position()
         dist = calc_Manh_distance(pos, pos_exit)
         
-        if conditions_needed(cell, neigh, neigh_pos, n_last_row, n_last_col, dist):  
+        if conditions_needed(cell, neigh, n_last_row, n_last_col):  
             neigh.set_moves(cell.get_moves() + 1)
             neigh.set_estimated_distance(dist)
             neigh.set_rotation(cell.get_rotation())
@@ -309,7 +341,18 @@ def expand(cell, pos_exit, n_last_row, n_last_col, queue):
 
 def A_Star(start, n_last_row, n_last_col): 
     '''
-    Runs AStar algorithm to find the shortest path
+    Runs AStar algorithm to find the shortest path.
+
+    Args:
+      - start: Cell object where the rectangle is going to start.
+      - n_last_row: integuer that represents the last row of the labyrinth.
+      - n_last_col: inetguer that represents the last column of the labyrinth.
+
+    Return:
+      - integuer that represents the minimum number of moves needed to exit the labyrinth.
+
+    Relevant Information:
+      - In case of not existing a path that exits the labyrinth, the algorithm returns -1. 
     '''
 
     start.set_moves(0)
@@ -324,30 +367,20 @@ def A_Star(start, n_last_row, n_last_col):
         if calc_Manh_distance(pos, pos_exit) == 1:
             return cell.get_moves()
         
-        queue += expand(cell, pos_exit, n_last_row, n_last_col, queue)
+        queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
         if possible_rotation_cells(pos, n_last_row, n_last_col):
             cell.rotate()
-            queue += expand(cell, pos_exit, n_last_row, n_last_col, queue)
+            queue += expand(cell, pos_exit, n_last_row, n_last_col)
 
-        queue.sort(key=lambda c: c.estimated_distance)#, reverse = True)
-
-        '''
-        print(len(queue))
-        l = []
-        for i in queue:
-            l.append(i.position)
-        print(l)
-        '''
-        
-        
+        queue.sort(key=lambda c: c.estimated_distance)#, reverse = True)    
 
     return -1
 
 
 ############################################################################################
 
-
+# TEST 4
 labyrinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".","#",".",".",".",".","#",".",".","."],
               [".","#",".",".",".",".",".",".",".","."],
@@ -359,11 +392,16 @@ labyrinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".",".",".",".","."],
               [".",".",".",".",".",".",".",".",".","." ] ]
 
+
+# TEST 3
 '''
 labyrinth =[ [".",".","."],
              [".",".","."],
              [".",".","."] ]
 '''
+
+
+# TEST 2
 '''
 labyrinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['#','.','.','.','#','.','.','#','.'],
@@ -371,6 +409,9 @@ labyrinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['.','#','.','.','.','.','.','#','.'],
               ['.','#','.','.','.','.','.','#','.'] ]
 '''
+
+
+# TEST 1
 '''
 labyrinth = [ ['.','.','.','.','.','.','.','.','.'],
               ['#','.','.','.','#','.','.','.','.'],
@@ -380,6 +421,22 @@ labyrinth = [ ['.','.','.','.','.','.','.','.','.'],
 '''
 
 if __name__ == "__main__":
+    '''
+    Main Program that runs the algorithm.
+
+    Input:
+      - labeynth: list of list of strings that represents the "map".
+    
+    Output:
+      - integuer that represents the minimum number of moves to exit the labyrinth.
+
+    Relevant information:
+      - The labyrinth is a global variable.
+      - The labyrinth list of lists contains characters "#" or ".".
+      - The minimu row/column size of the laberinth is 3.
+      - The maximum row/column size of the laberinth is 1000.
+      - In case of no existence of path to exit the labyrinth the output will be -1.
+    '''
 
     assert len(labyrinth) in range(3,1000), "ERROR: number of columns not accepted. Needs to be between 3 and 1000."
     assert len(labyrinth[-1]) in range(3,1000), "ERROR: number of rows not accepted. Needs to be between 3 and 1000."
