@@ -5,8 +5,9 @@ DAMAVIS CHALLENGE PROGRAM PROPORSAL
 @Date: 20/07/2023
 
 The program is separated in classes needed to run the search algorithm, auxiliar fucntions to calculate 
-rellevant data, function that translate the input ( list(list(str)) ) into the structure needed to run the
-search algorithm and the algorithm.
+rellevant data, functions that translate the input ( list(list(str)) ) into the structure needed to run the
+search algorithm and the algorithm, the algorithm and the main program with the global variable labyrinth 
+(the input of the program).
 
 For more information about the algorithms and explanations of the decisions done while programming consult
 the Readme file.
@@ -152,13 +153,31 @@ class Cell():
 ############################################################################################
 
 
-def calc_Manh_distance(pos, pos_exit): 
+def calc_Manh_distance(init_pos, end_pos): 
     '''
-    Calculates de Manhattan distance
+    Calculates de Manhattan distance between two cells
+
+    Args:
+      - init_pos: list with the coordinates of the init cell
+      - end_pos: list with the coordinates of the end cell
+
+    Return:
+      - float
     '''
-    return abs(sum(pos_exit)-sum(pos))
+    return abs(sum(end_pos)-sum(init_pos))
 
 def calc_cross_neighbors(pos, n_last_row, n_last_col):
+    '''
+    Calculates the lateral neighbors of a cell
+
+    Args:
+      - pos: list with the coordinates of the cell
+      - n_last_row: integuer that represents the last row of the labyrinth
+      - n_last_col: inetguer that represents the last column of the labyrinth 
+
+    Retun:
+      - list with the neighbors coordinates
+    '''
     neighs = []
 
     for i in ([1,0],[-1,0],[0,1],[0,-1]):
@@ -170,6 +189,17 @@ def calc_cross_neighbors(pos, n_last_row, n_last_col):
     return neighs
 
 def calc_vertice_neighbors(pos, n_last_row, n_last_col):
+    '''
+    Calculates the diagonal neighbors of a cell
+
+    Args:
+      - pos: list with the coordinates of the cell
+      - n_last_row: integuer that represents the last row of the labyrinth
+      - n_last_col: inetguer that represents the last column of the labyrinth 
+
+    Retun:
+      - list with the neighbors coordinates
+    '''
     neighs = []
     for i in [1,-1]:
         for j in [1,-1]:
@@ -185,6 +215,12 @@ def calc_vertice_neighbors(pos, n_last_row, n_last_col):
 
 
 def create_labyrinth_cell(n_last_row, n_last_col):
+    '''
+    Creates the cells and recreates the laberynth with them.
+
+    Args:
+      - 
+    '''
 
     upper_bound = (n_last_col+1)*n_last_row
 
@@ -305,6 +341,7 @@ def A_Star(start, n_last_row, n_last_col):
 
 
 ############################################################################################
+
 
 labyrinth = [ [".",".",".",".",".",".",".",".",".","."],
               [".","#",".",".",".",".","#",".",".","."],
